@@ -48,11 +48,20 @@ public function register(Request $request)
         $user->password = bcrypt($userData['password']);
         $user->save();
 
+        $token = $user->createToken('YourAppName')->plainTextToken;
 
+        // Return the user and token in the response
         return response()->json([
             "status" => true,
-            "message" => 'User added successfully!'
+            "message" => 'User registered successfully!',
+            "data" => [
+                "user" => $user,
+                "token" => $token
+            ]
         ]);
+
+
+
     }
 }
 public function login(Request $request){
@@ -115,7 +124,7 @@ public function login(Request $request){
 
 }
 
-public function UpdateUser(Request $request){
+public function update(Request $request){
 // Check if the request is a PUT/PATCH request
 if ($request->isMethod('put') || $request->isMethod('patch')) {
     // Get the authenticated user
@@ -162,6 +171,53 @@ return response()->json([
 ]);
 }
 
+
+public function delete(Request $request, $id)
+{
+
+  // Check if the request is using the DELETE method
+  if ($request->isMethod('delete')) {
+
+    // Get the currently authenticated user
+    $authenticatedUser = $request->user();
+
+    // Ensure the authenticated user is allowed to delete (e.g., only admins or the user themselves)
+    if ($authenticatedUser->id !== $id) {
+        return response()->json([
+            "status" => false,
+            "message" => "Unauthorized to delete this user."
+        ], 403);
+    }
+
+    // Find the user by ID
+    $user = User::find($id);
+
+    // If user not found, return error
+    if (!$user) {
+        return response()->json([
+            "status" => false,
+            "message" => "User not found."
+        ], 404);
+    }
+
+    // Delete the user
+    $user->delete();
+
+    // Return success response
+    return response()->json([
+        "status" => true,
+        "message" => "User deleted successfully!"
+    ]);
 }
+
+// If the request method is not DELETE
+return response()->json([
+    "status" => false,
+    "message" => "Invalid request method. Use DELETE."
+]);
+
+}
+}
+
 
 
