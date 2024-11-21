@@ -19,5 +19,7 @@ Route::middleware('auth:sanctum')->post("login", [UserController::class, "login"
 Route::middleware('auth:sanctum')->delete('/user/{id}', [UserController::class, 'delete']);
 
 //paystack//
-Route::post('/paystack/initialize', [PaystackController::class, 'initializePayment'])->name('paystack.initialize');
-Route::get('/paystack/callback', [PaystackController::class, 'handlePaymentCallback']);
+
+Route::post('paystack/initialize', [PaystackController::class, 'initializePayment']);
+Route::get('paystack/callback', [PaystackController::class, 'handlePaymentCallback']);
+Route::get('paystack/verify/{reference}', [PaystackController::class, 'verifyPayment']);
